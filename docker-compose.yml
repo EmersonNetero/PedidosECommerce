@@ -1,0 +1,37 @@
+
+services:
+  api:
+    container_name: pedidos-ecommerce-api
+    build:
+      context: ./PedidosECommerce
+      dockerfile: Dockerfile
+    ports:
+      - "4652:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - sqlserver
+    networks:
+      - pedidos-networks
+
+  sqlserver:
+    image: rapidfort/microsoft-sql-server-2019-ib:latest
+    ports:
+    - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "SenhaForte123!"
+    volumes:
+      - sqlserver-volume:/var/opt/mssql
+    networks:
+      pedidos-networks:
+        aliases:
+          - "sql"
+    
+
+volumes:
+  sqlserver-volume:
+
+networks:
+  pedidos-networks:
+    driver: bridge
