@@ -80,7 +80,7 @@ namespace PedidosECommerce.Application.Services
                 if (pedido == null)
                     throw new NotFoundException($"Pedido {id} não encontrado.");
                 pedido.Processar(PedidoStatus.EmProcessamento);
-                this.SimularProcessamento(pedido);
+                await this.SimularProcessamento(pedido);
                 if(pedido.Status == PedidoStatus.Processado)
                     _logger.LogInformation("Pedido processado com sucesso {id}", id);
                 else
@@ -90,12 +90,13 @@ namespace PedidosECommerce.Application.Services
             }catch (Exception ex)
             {
                 pedido.Processar(PedidoStatus.Falha, ex.Message);
+                await _pedidoRepository.SaveChangesAsync();
                 throw;
             }
                 
         }
 
-        private async void SimularProcessamento(Pedido pedido)
+        private async Task SimularProcessamento(Pedido pedido)
         {
             await Task.Delay(5000);
             var status = _random.Next(2) == 0 ? PedidoStatus.Processado : PedidoStatus.Falha;
