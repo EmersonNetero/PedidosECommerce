@@ -26,5 +26,11 @@ namespace PedidosECommerce.Controllers
         {
             return Ok(await _pedidoService.GetAsync(request));
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PedidoDetalheResponse>> GetDetalhe(int id)
+        {
+            return Ok(await _pedidoService.GetDetalhe(id));
+        }
     }
 }

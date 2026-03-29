@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using PedidosECommerce.Application.Abstractions;
 using PedidosECommerce.Application.Services;
+using PedidosECommerce.Domain.Exceptions;
 using PedidosECommerce.Infrastructure.Contexts;
 using PedidosECommerce.Infrastructure.Repositories;
 
@@ -54,6 +56,38 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<SqlServer>();
     db.Database.Migrate();
 }
+
+app.UseExceptionHandler(appError =>
+{
+    appError.Run(async context =>
+    {
+        var exception = context.Features
+            .Get<IExceptionHandlerFeature>()?
+            .Error;
+
+        context.Response.ContentType = "application/json";
+
+        switch (exception)
+        {
+            case NotFoundException:
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                break;
+                    
+            case ArgumentException:
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                break;
+
+            default:
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                break;
+        }
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            error = exception?.Message
+        });
+    });
+});
 
 app.MapControllers();
 

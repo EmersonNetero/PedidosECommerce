@@ -44,6 +44,14 @@ namespace PedidosECommerce.Infrastructure.Repositories
                 Items = items
             };
         }
+
+        public async Task<Pedido> GetOneAsync(int id)
+        {
+            var pedido = await _context.Pedidos.FirstOrDefaultAsync(p => p.Id == id);
+            return pedido;
+            
+        }
+
         public async Task ReceberPedidoAsync(Pedido pedido)
         {
             await _context.Pedidos.AddAsync(pedido);

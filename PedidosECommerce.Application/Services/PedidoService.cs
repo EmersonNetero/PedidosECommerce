@@ -1,6 +1,7 @@
 ﻿using PedidosECommerce.Application.Abstractions;
 using PedidosECommerce.Application.DTO;
 using PedidosECommerce.Domain.Entities;
+using PedidosECommerce.Domain.Exceptions;
 
 namespace PedidosECommerce.Application.Services
 {
@@ -32,6 +33,23 @@ namespace PedidosECommerce.Application.Services
                     Status = p.Status.ToString(),
                     DadosPedido = p.DadosPedido
                 })
+            };
+        }
+
+        public async Task<PedidoDetalheResponse> GetDetalhe(int id)
+        {
+            var result = await _pedidoRepository.GetOneAsync(id);
+
+            if (result == null)
+                throw new NotFoundException($"Pedido {id} não encontrado.");
+
+            return new PedidoDetalheResponse
+            {
+                NomeCliente = result.NomeCliente,
+                DadosPedido = result.DadosPedido,
+                CriadoEm = result.DataCriacao,
+                Status = result.Status.ToString(),
+                Id = result.Id
             };
         }
 

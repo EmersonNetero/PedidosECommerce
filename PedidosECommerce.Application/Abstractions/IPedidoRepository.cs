@@ -13,5 +13,7 @@ namespace PedidosECommerce.Application.Abstractions
         int page,
         int pageSize,
         Ordenacao order);
+
+        Task<Pedido> GetOneAsync(int id);
     }
 }
