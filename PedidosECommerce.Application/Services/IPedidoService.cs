@@ -7,6 +7,7 @@ namespace PedidosECommerce.Application.Services
         Task<PedidoRecebido> ReceberPedido(ReceberPedidoDTO pedido);
         Task<PagedResult<PedidoResponse>> GetAsync(PedidoFiltroRequest request);
         Task<PedidoDetalheResponse> GetDetalhe(int id);
+        Task ProcessarPedido(int id);
 
     }
 }

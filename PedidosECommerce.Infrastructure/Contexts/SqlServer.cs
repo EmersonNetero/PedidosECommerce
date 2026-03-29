@@ -7,6 +7,7 @@ namespace PedidosECommerce.Infrastructure.Contexts
     {
 
         public DbSet<Pedido> Pedidos { get; set; }
+        public DbSet<PedidoHistorico> PedidoHistoricos { get; set; }
         public SqlServer(DbContextOptions options) : base(options)
         {
 
@@ -17,6 +18,11 @@ namespace PedidosECommerce.Infrastructure.Contexts
             modelBuilder.Entity<Pedido>()
                 .Property(p => p.Status)
                 .HasConversion<string>();
+
+            modelBuilder.Entity<PedidoHistorico>()
+                .Property(p => p.Status)
+                .HasConversion<string>();
+            
         }
     }
 }

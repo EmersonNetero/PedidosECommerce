@@ -47,7 +47,7 @@ namespace PedidosECommerce.Infrastructure.Repositories
 
         public async Task<Pedido> GetOneAsync(int id)
         {
-            var pedido = await _context.Pedidos.FirstOrDefaultAsync(p => p.Id == id);
+            var pedido = await _context.Pedidos.Include(p => p.Historico).FirstOrDefaultAsync(p => p.Id == id);
             return pedido;
             
         }
@@ -57,5 +57,11 @@ namespace PedidosECommerce.Infrastructure.Repositories
             await _context.Pedidos.AddAsync(pedido);
             await _context.SaveChangesAsync();
         }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
+        
 }

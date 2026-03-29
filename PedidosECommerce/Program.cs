@@ -1,3 +1,4 @@
+using MassTransit;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using PedidosECommerce.Application.Abstractions;
@@ -5,6 +6,7 @@ using PedidosECommerce.Application.Services;
 using PedidosECommerce.Domain.Exceptions;
 using PedidosECommerce.Infrastructure.Contexts;
 using PedidosECommerce.Infrastructure.Repositories;
+using PedidosECommerce.Messaging;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +21,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddDbContext<SqlServer>(options =>
-
     options.UseSqlServer("Server=sql,1433;Database=PedidosDb;User id=sa;Password=SenhaForte123!;TrustServerCertificate=True;",
             sql => sql.EnableRetryOnFailure(
             maxRetryCount: 10,
@@ -33,6 +34,22 @@ builder.Services.AddCors(options =>
             .AllowAnyOrigin()
             .AllowAnyMethod()
             .AllowAnyHeader());
+});
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<PedidoConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("rabbitmq", "/", h =>
+        {
+            h.Username("admin");
+            h.Password("admin");
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
 });
 
 

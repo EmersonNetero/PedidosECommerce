@@ -32,5 +32,11 @@ namespace PedidosECommerce.Controllers
         {
             return Ok(await _pedidoService.GetDetalhe(id));
         }
+
+        [HttpPost("{id}/reprocessar")]
+        public async Task<IActionResult> Reprocessar(int id)
+        {
+            return Ok();
+        }
     }
 }

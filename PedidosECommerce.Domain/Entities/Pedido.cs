@@ -11,6 +11,7 @@ namespace PedidosECommerce.Domain.Entities
         public Guid CorrelationId { get; private set; }
         public DateTime DataCriacao { get; private set; }
         public DateTime? DataAtualizacao { get; private set; }
+        public List<PedidoHistorico> Historico { get; private set; } = new();
 
 
         public Pedido(string nomeCliente, string dadosPedido)
@@ -20,6 +21,15 @@ namespace PedidosECommerce.Domain.Entities
             CorrelationId = Guid.NewGuid();
             NomeCliente = nomeCliente;
             DadosPedido = dadosPedido;
+        }
+
+        public void Processar(PedidoStatus novoStatus, string? erro = null)
+        {
+            if(Status == PedidoStatus.Processado)
+                throw new InvalidOperationException("Pedido já processado");
+            Status = novoStatus;
+            DataAtualizacao = DateTime.UtcNow;
+            Historico.Add(new PedidoHistorico(novoStatus, erro));
         }
     }
 }

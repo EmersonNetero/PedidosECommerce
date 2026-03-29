@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="../PedidosECommerce.Messaging/PedidosECommerce.Messaging.csproj" Id="68840c8a-f567-4357-87cc-95127b9737c2" />
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>

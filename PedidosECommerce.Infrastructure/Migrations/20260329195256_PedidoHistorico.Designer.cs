@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PedidosECommerce.Infrastructure.Contexts;
 
@@ -11,9 +12,11 @@ using PedidosECommerce.Infrastructure.Contexts;
 namespace PedidosECommerce.Infrastructure.Migrations
 {
     [DbContext(typeof(SqlServer))]
-    partial class SqlServerModelSnapshot : ModelSnapshot
+    [Migration("20260329195256_PedidoHistorico")]
+    partial class PedidoHistorico
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,15 +76,14 @@ namespace PedidosECommerce.Infrastructure.Migrations
                     b.Property<int>("PedidoId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PedidoId");
 
-                    b.ToTable("PedidoHistoricos");
+                    b.ToTable("PedidoHistorico");
                 });
 
             modelBuilder.Entity("PedidosECommerce.Domain.Entities.PedidoHistorico", b =>

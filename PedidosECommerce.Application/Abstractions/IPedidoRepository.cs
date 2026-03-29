@@ -15,5 +15,6 @@ namespace PedidosECommerce.Application.Abstractions
         Ordenacao order);
 
         Task<Pedido> GetOneAsync(int id);
+        Task SaveChangesAsync();
     }
 }
