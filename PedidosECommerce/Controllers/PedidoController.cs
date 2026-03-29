@@ -20,5 +20,11 @@ namespace PedidosECommerce.Controllers
         {
             return Ok(await _pedidoService.ReceberPedido(novoPedido));
         }
+
+        [HttpGet]
+        public async Task<ActionResult<PagedResult<PedidoResponse>>> GetTodos([FromQuery] PedidoFiltroRequest request)
+        {
+            return Ok(await _pedidoService.GetAsync(request));
+        }
     }
 }
