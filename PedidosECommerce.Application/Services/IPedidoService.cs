@@ -8,6 +8,7 @@ namespace PedidosECommerce.Application.Services
         Task<PagedResult<PedidoResponse>> GetAsync(PedidoFiltroRequest request);
         Task<PedidoDetalheResponse> GetDetalhe(int id);
         Task ProcessarPedido(int id);
+        Task Reprocessar(int id);
 
     }
 }

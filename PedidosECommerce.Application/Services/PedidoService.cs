@@ -132,7 +132,25 @@ namespace PedidosECommerce.Application.Services
             return pedidoRecebido;
         }
 
+        public async Task Reprocessar(int id)
+        {
+            var pedido = await _pedidoRepository.GetOneAsync(id);
+            if (pedido == null) throw new NotFoundException("Pedido não encontrado.");
 
-       
+            if (pedido.Status != PedidoStatus.Falha) throw new ArgumentException("Esse pedido não pode ser reprocessado. Pedido com status diferente de Falha");
+
+            var evento = new PedidoCriadoEvent
+            {
+                Id = pedido.Id,
+                CorrelationId = pedido.CorrelationId,
+                NomeCliente = pedido.NomeCliente,
+                DadosPedido = pedido.DadosPedido,
+                Status = pedido.Status,
+                DataCriacao = pedido.DataCriacao,
+                UltimaAtualizacao = pedido.DataAtualizacao
+            };
+            await _publishEndpoint.Publish(evento);
+
+        }
     }
 }

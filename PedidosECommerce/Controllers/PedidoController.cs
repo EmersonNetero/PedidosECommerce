@@ -36,6 +36,7 @@ namespace PedidosECommerce.Controllers
         [HttpPost("{id}/reprocessar")]
         public async Task<IActionResult> Reprocessar(int id)
         {
+            await _pedidoService.Reprocessar(id);
             return Ok();
         }
     }
