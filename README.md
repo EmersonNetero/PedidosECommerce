@@ -33,6 +33,7 @@ Após subir os containers, os serviços podem ser acessados pelos seguintes link
 | ----------------------------- | ---------------------------------------- |
 | Swagger (documentação da API) | http://localhost:4652/swagger/index.html |
 | RabbitMQ Management           | http://localhost:15672                   |
+| Mongo (logs)                  | mongodb://mongo:27017                    |
 
 ### Credenciais padrão do RabbitMQ
 
