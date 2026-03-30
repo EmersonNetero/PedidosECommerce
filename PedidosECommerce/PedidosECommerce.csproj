@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\PedidosECommerce.Messaging\PedidosECommerce.Messaging.csproj" />
     <ProjectReference Include="..\PedidosECommerce.Application\PedidosECommerce.Application.csproj" />
     <ProjectReference Include="..\PedidosECommerce.Infrastructure\PedidosECommerce.Infrastructure.csproj" />
+    <ProjectReference Include="..\PedidosECommerce.Messaging\PedidosECommerce.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

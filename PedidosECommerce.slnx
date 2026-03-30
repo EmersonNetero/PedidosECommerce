@@ -1,10 +1,10 @@
 <Solution>
-  <Project Path="../PedidosECommerce.Messaging/PedidosECommerce.Messaging.csproj" Id="68840c8a-f567-4357-87cc-95127b9737c2" />
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>
   <Project Path="PedidosECommerce.Application/PedidosECommerce.Application.csproj" Id="bdfaad9d-eaa9-42be-a7bd-871dc7e98b9b" />
   <Project Path="PedidosECommerce.Domain/PedidosECommerce.Domain.csproj" Id="e9f3355b-e75d-444b-bd3a-dd5e8ccb7ef2" />
   <Project Path="PedidosECommerce.Infrastructure/PedidosECommerce.Infrastructure.csproj" Id="bded74af-d4ed-4327-ac75-5ec7dcf85487" />
+  <Project Path="PedidosECommerce.Messaging/PedidosECommerce.Messaging.csproj" Id="facb8ef6-511b-4c7f-8337-839a18128ecb" />
   <Project Path="PedidosECommerce/PedidosECommerce.csproj" />
 </Solution>
