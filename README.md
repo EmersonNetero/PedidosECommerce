@@ -25,6 +25,22 @@ docker compose up --build
 Após subir os containers, a API estará disponível junto com a documentação interativa via Swagger.
 
 ---
+## 🔗 Acessos úteis
+
+Após subir os containers, os serviços podem ser acessados pelos seguintes links:
+
+| Serviço                       | URL                                      |
+| ----------------------------- | ---------------------------------------- |
+| Swagger (documentação da API) | http://localhost:4652/swagger/index.html |
+| RabbitMQ Management           | http://localhost:15672                   |
+
+### Credenciais padrão do RabbitMQ
+
+```text
+Usuário: guest
+Senha: guest
+```
+___
 
 ## 🧱 Arquitetura do projeto
 
