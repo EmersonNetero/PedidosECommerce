@@ -16,13 +16,15 @@ namespace PedidosECommerce.Application.Services
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ILogger<PedidoService> _logger;
         private static readonly Random _random = new();
+        private readonly IMongoAuditRepository _auditRepo;
 
 
-        public PedidoService(IPedidoRepository pedidoRepository, IPublishEndpoint publishEndpoint, ILogger<PedidoService> logger)
+        public PedidoService(IPedidoRepository pedidoRepository, IPublishEndpoint publishEndpoint, ILogger<PedidoService> logger, IMongoAuditRepository auditRepo)
         {
             _pedidoRepository = pedidoRepository;
             _publishEndpoint = publishEndpoint;
             _logger = logger;
+            _auditRepo = auditRepo;
         }
 
         public async Task<PagedResult<PedidoResponse>> GetAsync(PedidoFiltroRequest request)
@@ -71,25 +73,66 @@ namespace PedidosECommerce.Application.Services
             };
         }
 
-        public async Task ProcessarPedido(int id)
+        public async Task ProcessarPedido(int id, Guid correlationId)
         {
             _logger.LogInformation("Processando pedido id:{id}", id);
+            await _auditRepo.RegistrarAsync(new PedidoAuditLog
+            {
+                PedidoId = id,
+                CorrelationId = correlationId,
+                Etapa = "Recebido",
+                Status = "OK"
+            });
             var pedido = await _pedidoRepository.GetOneAsync(id);
             try
             {
                 if (pedido == null)
                     throw new NotFoundException($"Pedido {id} não encontrado.");
                 pedido.Processar(PedidoStatus.EmProcessamento);
+
+                await _auditRepo.RegistrarAsync(new PedidoAuditLog
+                {
+                    PedidoId = id,
+                    CorrelationId = correlationId,
+                    Etapa = "Processamento",
+                    Status = "EmProcessamento"
+                });
+
                 await this.SimularProcessamento(pedido);
                 if(pedido.Status == PedidoStatus.Processado)
+                {
+                    await _auditRepo.RegistrarAsync(new PedidoAuditLog
+                    {
+                        PedidoId = id,
+                        CorrelationId = correlationId,
+                        Etapa = "Processamento",
+                        Status = "Processado"
+                    });
                     _logger.LogInformation("Pedido processado com sucesso {id}", id);
+                }
                 else
                 {
+                    await _auditRepo.RegistrarAsync(new PedidoAuditLog
+                    {
+                        PedidoId = id,
+                        CorrelationId = correlationId,
+                        Etapa = "Processamento",
+                        Status = "Falha",
+                        Erro = "Falha por simulação"
+                    });
                     _logger.LogInformation("Erro em processar o pedido {id}", id);
                 }
             }catch (Exception ex)
             {
                 pedido.Processar(PedidoStatus.Falha, ex.Message);
+                await _auditRepo.RegistrarAsync(new PedidoAuditLog
+                {
+                    PedidoId = id,
+                    CorrelationId = correlationId,
+                    Etapa = "Processamento",
+                    Status = "Falha",
+                    Erro = ex.Message
+                });
                 await _pedidoRepository.SaveChangesAsync();
                 throw;
             }
@@ -135,6 +178,14 @@ namespace PedidosECommerce.Application.Services
         public async Task Reprocessar(int id)
         {
             var pedido = await _pedidoRepository.GetOneAsync(id);
+            await _auditRepo.RegistrarAsync(new PedidoAuditLog
+            {
+                PedidoId = id,
+                CorrelationId = Guid.NewGuid(),
+                Etapa = "Reprocessamento",
+                Status = "Falha",
+                Erro = "Falha por simulação"
+            });
             if (pedido == null) throw new NotFoundException("Pedido não encontrado.");
 
             if (pedido.Status != PedidoStatus.Falha) throw new ArgumentException("Esse pedido não pode ser reprocessado. Pedido com status diferente de Falha");

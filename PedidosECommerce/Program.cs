@@ -1,6 +1,7 @@
 using MassTransit;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 using PedidosECommerce.Application.Abstractions;
 using PedidosECommerce.Application.Services;
 using PedidosECommerce.Domain.Exceptions;
@@ -52,6 +53,16 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddSingleton<IMongoClient>(sp =>
+    new MongoClient("mongodb://mongo:27017"));
+
+builder.Services.AddScoped<IMongoDatabase>(sp =>
+{
+    var client = sp.GetRequiredService<IMongoClient>();
+    return client.GetDatabase("PedidosAudit");
+});
+
+builder.Services.AddScoped<IMongoAuditRepository, MongoAuditRepository>();
 
 var app = builder.Build();
 

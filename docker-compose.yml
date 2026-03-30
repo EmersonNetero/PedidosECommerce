@@ -12,6 +12,7 @@ services:
     depends_on:
       - sqlserver
       - rabbitmq
+      - mongo
     networks:
       - pedidos-networks
 
@@ -43,10 +44,23 @@ services:
     networks:
       - pedidos-networks
     
+  mongo:
+    image: mongo:7
+    container_name: pedidos-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-volume:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=PedidosAudit
+    networks:
+      - pedidos-networks
 
 volumes:
   sqlserver-volume:
   rabbitmq-volume:
+  mongo-volume:
 
 networks:
   pedidos-networks:
