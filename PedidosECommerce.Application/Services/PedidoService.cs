@@ -6,7 +6,6 @@ using PedidosECommerce.Domain;
 using PedidosECommerce.Domain.Entities;
 using PedidosECommerce.Domain.Enums;
 using PedidosECommerce.Domain.Exceptions;
-using static MassTransit.ValidationResultExtensions;
 
 namespace PedidosECommerce.Application.Services
 {
@@ -17,14 +16,16 @@ namespace PedidosECommerce.Application.Services
         private readonly ILogger<PedidoService> _logger;
         private static readonly Random _random = new();
         private readonly IMongoAuditRepository _auditRepo;
+        private readonly ICacheService _cacheService;
 
 
-        public PedidoService(IPedidoRepository pedidoRepository, IPublishEndpoint publishEndpoint, ILogger<PedidoService> logger, IMongoAuditRepository auditRepo)
+        public PedidoService(IPedidoRepository pedidoRepository, IPublishEndpoint publishEndpoint, ILogger<PedidoService> logger, IMongoAuditRepository auditRepo, ICacheService cacheService)
         {
             _pedidoRepository = pedidoRepository;
             _publishEndpoint = publishEndpoint;
             _logger = logger;
             _auditRepo = auditRepo;
+            _cacheService = cacheService;
         }
 
         public async Task<PagedResult<PedidoResponse>> GetAsync(PedidoFiltroRequest request)
@@ -51,12 +52,14 @@ namespace PedidosECommerce.Application.Services
 
         public async Task<PedidoDetalheResponse> GetDetalhe(int id)
         {
-            var result = await _pedidoRepository.GetOneAsync(id);
-
+            var cacheKey = $"pedido:{id}";
+            var result = await _cacheService.GetAsync<Pedido>(cacheKey);
+            if(result == null)
+                result = await _pedidoRepository.GetOneAsync(id);
             if (result == null)
                 throw new NotFoundException($"Pedido {id} não encontrado.");
 
-            return new PedidoDetalheResponse
+            var pedidoDetalhe = new PedidoDetalheResponse
             {
                 NomeCliente = result.NomeCliente,
                 DadosPedido = result.DadosPedido,
@@ -71,6 +74,9 @@ namespace PedidosECommerce.Application.Services
                     Erro = h.Erro
                 }).ToList(),
             };
+
+            await _cacheService.SetAsync(cacheKey, pedidoDetalhe, TimeSpan.FromMinutes(5));
+            return pedidoDetalhe;
         }
 
         public async Task ProcessarPedido(int id, Guid correlationId)
@@ -98,7 +104,7 @@ namespace PedidosECommerce.Application.Services
                     Status = "EmProcessamento"
                 });
 
-                await this.SimularProcessamento(pedido);
+                await this.Processar(pedido);
                 if(pedido.Status == PedidoStatus.Processado)
                 {
                     await _auditRepo.RegistrarAsync(new PedidoAuditLog
@@ -139,12 +145,13 @@ namespace PedidosECommerce.Application.Services
                 
         }
 
-        private async Task SimularProcessamento(Pedido pedido)
+        private async Task Processar(Pedido pedido)
         {
             await Task.Delay(5000);
             var status = _random.Next(2) == 0 ? PedidoStatus.Processado : PedidoStatus.Falha;
             pedido.Processar(status);
             await _pedidoRepository.SaveChangesAsync();
+            await _cacheService.RemoveAsync($"pedido{pedido.Id}");
         }
 
         public async Task<PedidoRecebido> ReceberPedido(ReceberPedidoDTO pedido)

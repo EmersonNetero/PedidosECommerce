@@ -56,11 +56,22 @@ services:
       - MONGO_INITDB_DATABASE=PedidosAudit
     networks:
       - pedidos-networks
+   
+  redis:
+    image: redis:7
+    container_name: pedidos-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-volume:/data
+    networks:
+      - pedidos-networks
 
 volumes:
   sqlserver-volume:
   rabbitmq-volume:
   mongo-volume:
+  redis-volume:
 
 networks:
   pedidos-networks:

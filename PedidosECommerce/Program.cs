@@ -64,6 +64,13 @@ builder.Services.AddScoped<IMongoDatabase>(sp =>
 
 builder.Services.AddScoped<IMongoAuditRepository, MongoAuditRepository>();
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "redis:6379";
+});
+
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
