@@ -50,16 +50,6 @@ Essa estrutura facilita testes, manutenção e evolução do sistema.
 
 ---
 
-## 📚 Documentação da API
-
-A documentação dos endpoints foi implementada com **Swagger**, permitindo:
-
-* Visualização de rotas disponíveis
-* Teste direto via navegador
-* Visualização de modelos de requisição e resposta
-
----
-
 ## 📦 Enums utilizados na API
 
 Alguns endpoints utilizam enums para filtragem e ordenação.
