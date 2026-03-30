@@ -185,6 +185,9 @@ namespace PedidosECommerce.Application.Services
         public async Task Reprocessar(int id)
         {
             var pedido = await _pedidoRepository.GetOneAsync(id);
+            if (pedido == null) throw new NotFoundException("Pedido não encontrado.");
+
+            if (pedido.Status != PedidoStatus.Falha) throw new ArgumentException("Esse pedido não pode ser reprocessado. Pedido com status diferente de Falha");
             await _auditRepo.RegistrarAsync(new PedidoAuditLog
             {
                 PedidoId = id,
@@ -193,9 +196,6 @@ namespace PedidosECommerce.Application.Services
                 Status = "Falha",
                 Erro = "Falha por simulação"
             });
-            if (pedido == null) throw new NotFoundException("Pedido não encontrado.");
-
-            if (pedido.Status != PedidoStatus.Falha) throw new ArgumentException("Esse pedido não pode ser reprocessado. Pedido com status diferente de Falha");
 
             var evento = new PedidoCriadoEvent
             {
