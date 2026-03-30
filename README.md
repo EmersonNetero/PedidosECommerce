@@ -37,8 +37,8 @@ Após subir os containers, os serviços podem ser acessados pelos seguintes link
 ### Credenciais padrão do RabbitMQ
 
 ```text
-Usuário: guest
-Senha: guest
+Usuário: admin
+Senha: admin
 ```
 ___
 
