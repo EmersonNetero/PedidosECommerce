@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using PedidosECommerce.Application.Abstractions;
 using PedidosECommerce.Application.DTO;
 using PedidosECommerce.Domain.Entities;
@@ -61,6 +62,22 @@ namespace PedidosECommerce.Infrastructure.Repositories
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> MarcarComoReprocessado(int id)
+        {
+            var rows = await _context.Database.ExecuteSqlRawAsync(
+                            """
+                    UPDATE Pedidos
+                    SET Status = @novoStatus
+                    WHERE Id = @id AND Status = @statusAtual
+                    """,
+                new SqlParameter("@novoStatus", PedidoStatus.Reprocessado.ToString()),
+                new SqlParameter("@id", id),
+                new SqlParameter("@statusAtual", PedidoStatus.Falha.ToString())
+            );
+
+            return rows > 0;
         }
     }
         

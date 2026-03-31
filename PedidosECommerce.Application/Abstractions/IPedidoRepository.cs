@@ -16,5 +16,7 @@ namespace PedidosECommerce.Application.Abstractions
 
         Task<Pedido> GetOneAsync(int id);
         Task SaveChangesAsync();
+
+        Task<bool> MarcarComoReprocessado(int id);
     }
 }

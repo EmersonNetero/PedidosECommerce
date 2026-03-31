@@ -184,10 +184,12 @@ namespace PedidosECommerce.Application.Services
 
         public async Task Reprocessar(int id)
         {
-            var pedido = await _pedidoRepository.GetOneAsync(id);
-            if (pedido == null) throw new NotFoundException("Pedido não encontrado.");
+            var atualizado = await _pedidoRepository.MarcarComoReprocessado(id);
 
-            if (pedido.Status != PedidoStatus.Falha) throw new ArgumentException("Esse pedido não pode ser reprocessado. Pedido com status diferente de Falha");
+            if (!atualizado)
+                throw new ArgumentException("Pedido não pode ser reprocessado.");
+
+            var pedido = await _pedidoRepository.GetOneAsync(id);
             await _auditRepo.RegistrarAsync(new PedidoAuditLog
             {
                 PedidoId = id,
