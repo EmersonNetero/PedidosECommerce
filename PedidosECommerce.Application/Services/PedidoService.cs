@@ -151,7 +151,7 @@ namespace PedidosECommerce.Application.Services
             var status = _random.Next(2) == 0 ? PedidoStatus.Processado : PedidoStatus.Falha;
             pedido.Processar(status);
             await _pedidoRepository.SaveChangesAsync();
-            await _cacheService.RemoveAsync($"pedido{pedido.Id}");
+            await _cacheService.RemoveAsync($"pedido:{pedido.Id}");
         }
 
         public async Task<PedidoRecebido> ReceberPedido(ReceberPedidoDTO pedido)
